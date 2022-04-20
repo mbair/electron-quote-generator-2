@@ -1,0 +1,1 @@
+# electron-quote-generator-2
