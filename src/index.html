@@ -70,8 +70,24 @@
     </div>
 
   <section id="excel">
+   
+    <form style="z-index: 999">
+      <div class="row g-2">
+        <div class="col-md">
+          <div class="form-floating">
+            <select id="mentett_ajanlat" class="form-select" aria-label="Mentett ajánlat kiválasztása">
+              <option value="1" selected>1. Cég</option>
+              <option value="2">2. Cég</option>
+              <option value="3">3. Cég</option>
+            </select>
+            <label for="mentett_ajanlat">Mentett ajánlat kiválasztása</label>
+          </div>
+        </div>
+      </div>
+    </form>
+   
     <div class="wrapper">
-      <div class="drop">
+      <div class="drop" style="top: 110px; height: 85%">
         <div class="cont">
           <i class="fas fa-cloud-upload-alt fa-5x"></i>
           <div class="tit">
@@ -281,6 +297,7 @@
             <select id="fizetesi_mod" class="form-select" aria-label="Fizetési mód">
               <option value="Előre utalás" selected>Előre utalás</option>
               <option value="Halasztott utalás">Halasztott utalás</option>
+              <option value="Készpénzes fizetés">Készpénzes fizetés</option>
             </select>
             <label for="fizetesi_mod">Fizetési mód</label>
           </div>
@@ -384,6 +401,16 @@
                 <option value="30%">30%</option>
               </select>
               <label for="kedvezmeny-szazalek">Kedvezmény százaléka</label>
+            </div>
+
+            <div class="form-floating mb-3">
+              <input type="number" class="form-control" id="kedvezmeny-konkretar" placeholder="Konkrét ár (EUR/L, Kg)" min="0">
+              <label for="kedvezmeny-konkretar">Konkrét ár (EUR/L, Kg)</label>
+            </div>
+
+            <div class="form-floating mb-3">
+              <input type="number" class="form-control" id="kedvezmeny-mertek" placeholder="Kedvezmény mértéke (EUR)" min="0">
+              <label for="kedvezmeny-mertek">Kedvezmény mértéke (EUR)</label>
             </div>
 
             <div class="form-check">

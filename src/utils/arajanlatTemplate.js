@@ -139,7 +139,7 @@ var arajanlatTemplate = [
         margin: [0,20,0,10],
     },
     {
-        text: 'Árajánlat kérése alapján az értintett Mobil kenőanyagok szállítására az alábbi ajánlatot tesszük:'
+        text: 'Árajánlat kérése alapján az érintett Mobil kenőanyagok szállítására az alábbi ajánlatot tesszük:'
     },
     {
         text: '1. Termékek és áraik:',

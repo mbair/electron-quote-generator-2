@@ -1,3 +1,4 @@
+const fs = require('fs');
 import path from 'path';
 import { createWriteStream, mkdir } from 'fs';
 import { pipeline } from 'stream';
@@ -235,3 +236,22 @@ export const processFile = async (filePath, outputPath, browserWindow) => {
   // }
 
 };
+
+export const processJSON = async (filePath, outputPath, browserWindow) => {
+
+  _resetProcessData()
+
+  browserWindow.webContents.send('main-message', {
+    type: 'process-started'
+  });
+
+  const fileData = fs.readFileSync(filePath)
+  const json = JSON.parse(fileData)
+
+  browserWindow.webContents.send('main-message', {
+    type: 'json-feldolgozva',
+    data: {
+      json
+    }
+  });
+}

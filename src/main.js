@@ -1,8 +1,16 @@
+const fs = require('fs');
 const path = require('path');
 const { app, BrowserWindow, ipcMain } = require('electron');
-const { processFile } = require('./utils/processItems');
+const { processFile, processJSON } = require('./utils/processItems');
+const { Notification } = require('electron')
 // import { showOpenDialog } from './dialogs';
 // import url from 'url';
+
+// Windows alatt beállítjuk az APP nevét
+// Értesítéseknél jelenik meg
+if (process.platform === 'win32') {
+    app.setAppUserModelId(app.name);
+}
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -14,6 +22,7 @@ console.log('-- path', path);
 console.log('-- __dirname', __dirname);
 
 var win;
+const ipc = ipcMain;
 
 const createWindow = () => {
   // Create the browser window.
@@ -26,7 +35,7 @@ const createWindow = () => {
       contextIsolation: true,
       enableRemoteModule: false,
       nodeIntegration: true,
-      // preload: path.join(__dirname, 'preload.js')
+      preload: path.join(__dirname, 'preload.js')
     }
   });
 
@@ -46,9 +55,27 @@ const createWindow = () => {
 // app.on('ready', createWindow);
 app.on('ready', () => {
   ipcMain.on('file-dropped', (event, filePath) => {
-    processFile(filePath, null, win);
-    // showOpenDialog(win, filePath, processFile); // Mentés mappa kiválasztása
+
+    console.log('filePath', filePath)
+
+    let fileExt = filePath.split('.').pop();
+    
+    switch (fileExt) {
+      case 'xls':
+      case 'xlsx':
+        processFile(filePath, null, win)
+        break
+      case 'json':
+        processJSON(filePath, null, win)
+        break
+      default:
+        new Notification({ title: 'Nem megfelelő fájlformátum!', body: 'Csak XLS, XLSX, JSON kiterjesztésű fájlok megengedettek' }).show()
+    }
   });
+
+  // ipcMain.on('ajanlat-save', (event, data) => {
+  //   console.log(data)
+  // });
 
   createWindow();
 });
@@ -61,6 +88,17 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
+});
+
+app.on('saveText', (event, txtVal) => {
+  console.log('saveText');
+  fs.writeFile('teszt.txt', txtVal, (err) => {
+    if (!err) {
+      console.log('File written!')
+    } else {
+      console.log(err)
+    }
+  })
 });
 
 app.on('activate', () => {
