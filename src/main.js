@@ -35,6 +35,7 @@ const createWindow = () => {
       contextIsolation: true,
       enableRemoteModule: false,
       nodeIntegration: true,
+      nodeIntegrationInWorker: true, // Multi-threaded Node.js
       preload: path.join(__dirname, 'preload.js')
     }
   });

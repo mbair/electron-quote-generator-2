@@ -552,6 +552,8 @@ const currencyFormatHU = (num, decimals = 0) => {
         action: function ( e, dt, node, config ) {
           let rows = kedvezmenyekTable.rows({selected: true}).data()
           let maxSzazalek = Math.max.apply(Math, rows.map(i => parseInt(i[4])))
+
+          console.log('maxSzazalek', maxSzazalek)
           
           if (maxSzazalek){
             $('#kedvezmeny-szazalek option[value="'+maxSzazalek+'%"]').prop('selected', true)
@@ -830,11 +832,11 @@ const currencyFormatHU = (num, decimals = 0) => {
         let kedvezmenyesArak = {};
 
         // Százalékos kedvezmény
-        if (szazalek > 0) {
+        if (szazalek >= 0) { // TODO: Nem jól működik
 
           // Kedvezményes árak (2 tizedesjegyre kerekítve)
           kedvezmenyesArak = {
-            kedvezmeny: szazalek != 0 ? ' + ' + szazalek + '%' : '',
+            kedvezmeny: szazalek != 0 ? ' - ' + szazalek + '%' : '',
             literAr: discountPrice(eredetiArak.literAr, szazalek, 2),
             kiszerelesAr: discountPrice(eredetiArak.kiszerelesAr, szazalek, 2),
             tajekoztatoErtek: discountPrice(eredetiArak.tajekoztatoErtek, szazalek),

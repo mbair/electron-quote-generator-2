@@ -170,6 +170,7 @@ table.dataTable thead {
 .filters > th:nth-child(7) > input[type=text] { display: none }  /* Tájékoztató ár */
 
 table.dataTable tbody tr.kedvezmeny-sor,
+table.dataTable tbody tr.kedvezmeny-sor.odd,
 table.dataTable.hover tbody tr.kedvezmeny-sor:hover, 
 table.dataTable.display tbody tr.kedvezmeny-sor:hover,
 table.dataTable.order-column tbody tr.kedvezmeny-sor>.sorting_1, 
