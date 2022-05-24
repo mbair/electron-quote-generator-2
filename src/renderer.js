@@ -806,7 +806,7 @@ const currencyFormatHU = (num, decimals = 0) => {
     let arfolyam = parseInt($('#arfolyam').text());
 
     // Kedvezmény beállítása (százalékos, vagy konkrét áras)
-    if ((0 <= szazalek && szazalek <= 30) || konkretAr > 0) {
+    if ((0 < szazalek && szazalek <= 30) || konkretAr > 0) {
 
       // A kijelölt sorokra alkalmazzuk a %-os kedvezményt
       let rows = kedvezmenyekTable.rows({selected: true})
@@ -832,7 +832,7 @@ const currencyFormatHU = (num, decimals = 0) => {
         let kedvezmenyesArak = {};
 
         // Százalékos kedvezmény
-        if (szazalek >= 0) { // TODO: Nem jól működik
+        if (szazalek > 0) { // TODO: Nem jól működik
 
           // Kedvezményes árak (2 tizedesjegyre kerekítve)
           kedvezmenyesArak = {
@@ -846,7 +846,7 @@ const currencyFormatHU = (num, decimals = 0) => {
         } else {
 
           kedvezmenyesArak = {
-            kedvezmeny: (parseFloat(eredetiArak.literAr) - parseFloat(konkretAr)) * -1 + ' EUR',
+            kedvezmeny: (parseFloat(eredetiArak.literAr) - parseFloat(konkretAr)).toFixed(2) * -1 + ' EUR',
             literAr: konkretAr,
             kiszerelesAr: konkretAr * eredetiArak.kiszereles,
             tajekoztatoErtek: konkretAr * eredetiArak.kiszereles * arfolyam,

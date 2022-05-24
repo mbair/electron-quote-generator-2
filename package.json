@@ -1,8 +1,8 @@
 {
   "name": "lubexpert-arajanlat-keszito",
-  "productName": "Lubexpert Árajánlat Készítő",
+  "productName": "Lubexpert Arajánlat Keszito",
   "version": "2.0.0",
-  "description": "Lubexpert Árajánlat Készítő",
+  "description": "Lubexpert Arajánlat Keszito",
   "main": ".webpack/main",
   "scripts": {
     "start": "electron-forge start",
@@ -20,7 +20,9 @@
   "license": "MIT",
   "config": {
     "forge": {
-      "packagerConfig": {},
+      "packagerConfig": {
+        "icon": "./src/images/lubexpert-logo-150px.png"
+      },
       "makers": [
         {
           "name": "@electron-forge/maker-squirrel",

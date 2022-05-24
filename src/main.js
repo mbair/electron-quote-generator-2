@@ -18,11 +18,7 @@ if (require('electron-squirrel-startup')) {
   app.quit();
 }
 
-console.log('-- path', path);
-console.log('-- __dirname', __dirname);
-
 var win;
-const ipc = ipcMain;
 
 const createWindow = () => {
   // Create the browser window.
@@ -46,8 +42,10 @@ const createWindow = () => {
   // maximize the window size
   win.maximize();
 
-  // Open the DevTools.
-  win.webContents.openDevTools();
+  // Open the DevTools
+  if (process.env.NODE_ENV === 'development') {
+    win.webContents.openDevTools();
+  }
 };
 
 // This method will be called when Electron has finished
