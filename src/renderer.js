@@ -551,15 +551,15 @@ const currencyFormatHU = (num, decimals = 0) => {
         },
         action: function ( e, dt, node, config ) {
           let rows = kedvezmenyekTable.rows({selected: true}).data()
-          let maxSzazalek = Math.max.apply(Math, rows.map(i => parseInt(i[4])))
+          // let maxSzazalek = Math.max.apply(Math, rows.map(i => parseInt(i[4])))
 
-          console.log('maxSzazalek', maxSzazalek)
+          // console.log('maxSzazalek', maxSzazalek)
           
-          if (maxSzazalek){
-            $('#kedvezmeny-szazalek option[value="'+maxSzazalek+'%"]').prop('selected', true)
-          } else {
-            $('#kedvezmeny-szazalek option[value="0%"]').prop('selected', true)
-          }
+          // if (maxSzazalek){
+          //   $('#kedvezmeny-szazalek option[value="'+maxSzazalek+'%"]').prop('selected', true)
+          // } else {
+          //   $('#kedvezmeny-szazalek option[value="0%"]').prop('selected', true)
+          // }
           $('#kedvezmeny-mertek').val('')
         }
       }, 
@@ -798,97 +798,162 @@ const currencyFormatHU = (num, decimals = 0) => {
    */
   const kedvezmenySave = () => {
     
-    let szazalek = parseInt($('#kedvezmeny-szazalek').val()) || 0;
-    let mertek = parseInt($('#kedvezmeny-mertek').val()) || 0;
-    let konkretAr = parseInt($('#kedvezmeny-konkretar').val()) || 0;
-    let raklapos = $('#raklapos-tetel').is(':checked');
-    let erteJon = $('#szallitasi_forma').val() == 'Érte jön';
-    let arfolyam = parseInt($('#arfolyam').text());
+    let szazalek = parseInt($('#kedvezmeny-szazalek').val()) || 0
+    let mertek = parseInt($('#kedvezmeny-mertek').val()) || 0
+    let konkretAr = parseInt($('#kedvezmeny-konkretar').val()) || 0
+    let raklapos = $('#raklapos-tetel').is(':checked')
+    let erteJon = $('#szallitasi_forma').val() == 'Érte jön'
+    let arfolyam = parseInt($('#arfolyam').text())
 
-    // Kedvezmény beállítása (százalékos, vagy konkrét áras)
-    if ((0 < szazalek && szazalek <= 30) || konkretAr > 0) {
+    // Kedvezmény fajták
+    // - százalékos
+    // - konkrét ár
+    // - mérték
+    // - Raklapos
+    // - érte jön
 
-      // A kijelölt sorokra alkalmazzuk a %-os kedvezményt
-      let rows = kedvezmenyekTable.rows({selected: true})
+    // Vagy százalékos kedvezményt ad, vagy konrkét árat
 
-      // Kedvezmény alkalmazása a táblázat soraira
-      rows.every(function (rowIdx, tableLoop, rowLoop) {
-          
-        let termekNev = kedvezmenyekTable.cell(rowIdx, 1).data()
-        let tovabbiKedvezmeny = 0
+    // Lehetséges kedvezmények
+    // - százalékos (0-30%)
+    // -- raklapos
+    // --- érte jön
+    // ---- mérték
+    // --- mérték
+    // -- mérték
+    // --- érte jön
+    // -- érte jön
+    // - konkrét ár
+    // -- raklapos
+    // --- érte jön
+    // ---- mérték
+    // --- mérték
+    // -- mérték
+    // --- érte jön
+    // -- érte jön
 
-        // Sor azonosítása terméknév szerint
-        let row = tetelekTable.rows().data().filter(row => row[1] == termekNev)[0]
-        if (!row) return
+    // - százalékos (0-30%)
+    // - százalékos + raklapos
+    // - százalékos + raklapos + érte jön
+    // - százalékos + raklapos + mérték
+    // - százalékos + raklapos + érte jön + mérték
+    // - százalékos + mérték
+    // - százalékos + mérték + érte jön
+    // - százalékos + érte jön
 
-        // Eredeti árak
-        let eredetiArak = {
-          literAr: row[4],
-          kiszereles: row[3], 
-          kiszerelesAr: row[5],
-          tajekoztatoErtek: row[6],
+    // - konkrét ár
+    // - konkrét ár + raklapos
+    // - konkrét ár + raklapos + érte jön
+    // - konkrét ár + raklapos + mérték
+    // - konkrét ár + raklapos + érte jön + mérték
+    // - konkrét ár + mérték
+    // - konkrét ár + mérték + érte jön
+    // - konkrét ár + érte jön
+
+    // Az árat befolyásoló tényezők 
+    // - százalékos
+    // - konrét ár
+
+    // Működőképes logika
+    // IF százalékos
+    //    százalékos kedvezmény beállítása soronként
+    //
+    // ELSE konkrét ár
+    //    konkrét ár kedvezmény beállítása soronként
+    // ENDIF
+    //
+    // IF RAKLAPOS
+    //    RAKLAPOS kedvezmény hozzádazása soronként
+    // ENDIF
+    //
+    // IF ÉRTE JÖN
+    //    ÉRTE JÖN kedvezmény hozzádazása soronként
+    // ENDIF
+    //
+    // IF MÉRTÉK
+    //    MÉRTÉK kedvezémny hozzádazása
+    // ENDIF
+
+    // Kijelölt sorokra alkalmazzuk a kedvezményt/kedvezményeket
+    let rows = kedvezmenyekTable.rows({selected: true})
+
+    // Kedvezmény alkalmazása a táblázat soraira
+    rows.every(function (rowIdx, tableLoop, rowLoop) {
+
+      let termekNev = kedvezmenyekTable.cell(rowIdx, 1).data()
+      let tovabbiKedvezmeny = 0
+
+      // Sor azonosítása terméknév szerint
+      let row = tetelekTable.rows().data().filter(row => row[1] == termekNev)[0]
+      if (!row) return
+
+      // Eredeti árak
+      let eredetiArak = {
+        literAr: row[4],
+        kiszereles: row[3], 
+        kiszerelesAr: row[5],
+        tajekoztatoErtek: row[6],
+      }
+
+      let kedvezmenyesArak = {}
+
+      // Százalékos kedvezmény 
+      if (0 <= szazalek && szazalek <= 30) {
+
+        // Kedvezményes árak (2 tizedesjegyre kerekítve)
+        kedvezmenyesArak = {
+          kedvezmeny: szazalek != 0 ? ' - ' + szazalek + '%' : '',
+          literAr: discountPrice(eredetiArak.literAr, szazalek, 2),
+          kiszerelesAr: discountPrice(eredetiArak.kiszerelesAr, szazalek, 2),
+          tajekoztatoErtek: discountPrice(eredetiArak.tajekoztatoErtek, szazalek),
         }
+      }
+      
+      // Konkrét áras kedvezmény
+      if (szazalek == 0 && konkretAr > 0) {
 
-        let kedvezmenyesArak = {};
-
-        // Százalékos kedvezmény
-        if (szazalek > 0) { // TODO: Nem jól működik
-
-          // Kedvezményes árak (2 tizedesjegyre kerekítve)
-          kedvezmenyesArak = {
-            kedvezmeny: szazalek != 0 ? ' - ' + szazalek + '%' : '',
-            literAr: discountPrice(eredetiArak.literAr, szazalek, 2),
-            kiszerelesAr: discountPrice(eredetiArak.kiszerelesAr, szazalek, 2),
-            tajekoztatoErtek: discountPrice(eredetiArak.tajekoztatoErtek, szazalek),
-          }
-
-        // Konkrét áras kedvezmény
-        } else {
-
-          kedvezmenyesArak = {
-            kedvezmeny: (parseFloat(eredetiArak.literAr) - parseFloat(konkretAr)).toFixed(2) * -1 + ' EUR',
-            literAr: konkretAr,
-            kiszerelesAr: konkretAr * eredetiArak.kiszereles,
-            tajekoztatoErtek: konkretAr * eredetiArak.kiszereles * arfolyam,
-          }
-
+        kedvezmenyesArak = {
+          kedvezmeny: (parseFloat(eredetiArak.literAr) - parseFloat(konkretAr)).toFixed(2) * -1 + ' EUR',
+          literAr: konkretAr,
+          kiszerelesAr: konkretAr * eredetiArak.kiszereles,
+          tajekoztatoErtek: konkretAr * eredetiArak.kiszereles * arfolyam,
         }
+      }
 
-        // Raklapos tételek kedvezménye (EUR/L árból lejön további 0.05 EUR)
-        // Ha érte jön, akkor további 0.09 EUR lejön, a kedvezmények összevonódnak
-        if (raklapos || erteJon) {
-          
-          if (raklapos) tovabbiKedvezmeny += 0.05
-          if (erteJon) tovabbiKedvezmeny += 0.09 
+      // Raklapos kedvezmény
+      if (raklapos) tovabbiKedvezmeny += 0.05
 
-          kedvezmenyesArak.kedvezmeny = (tovabbiKedvezmeny > 0 && tovabbiKedvezmeny + ' EUR') + kedvezmenyesArak.kedvezmeny
-          kedvezmenyesArak.literAr = kedvezmenyesArak.literAr - tovabbiKedvezmeny
-          kedvezmenyesArak.kiszerelesAr = (kedvezmenyesArak.kiszerelesAr - tovabbiKedvezmeny) * eredetiArak.kiszereles
-          kedvezmenyesArak.tajekoztatoErtek = Math.ceil(kedvezmenyesArak.kiszerelesAr * arfolyam)
-        }
+      // Érte jön kedvezmény
+      if (erteJon) tovabbiKedvezmeny += 0.09
 
-        // Árak cseréje kedvezményesre
-        kedvezmenyekTable.cell(rowIdx, 4).data(kedvezmenyesArak.kedvezmeny)
-        kedvezmenyekTable.cell(rowIdx, 5).data(kedvezmenyesArak.literAr)
-        kedvezmenyekTable.cell(rowIdx, 6).data(kedvezmenyesArak.kiszerelesAr)
-        kedvezmenyekTable.cell(rowIdx, 7).data(kedvezmenyesArak.tajekoztatoErtek)
-        
-      })
-    
-    }
+      if (tovabbiKedvezmeny > 0) {
+        kedvezmenyesArak.kedvezmeny = tovabbiKedvezmeny + ' EUR' + kedvezmenyesArak.kedvezmeny
+        kedvezmenyesArak.literAr = (kedvezmenyesArak.literAr - tovabbiKedvezmeny).toFixed(2)
+        kedvezmenyesArak.kiszerelesAr = (kedvezmenyesArak.kiszerelesAr - (tovabbiKedvezmeny * eredetiArak.kiszereles)).toFixed(2)
+      }
+
+      kedvezmenyesArak.tajekoztatoErtek = Math.ceil(kedvezmenyesArak.kiszerelesAr * arfolyam)
+      
+      // Árak cseréje kedvezményesre
+      kedvezmenyekTable.cell(rowIdx, 4).data(kedvezmenyesArak.kedvezmeny)
+      kedvezmenyekTable.cell(rowIdx, 5).data(kedvezmenyesArak.literAr)
+      kedvezmenyekTable.cell(rowIdx, 6).data(kedvezmenyesArak.kiszerelesAr)
+      kedvezmenyekTable.cell(rowIdx, 7).data(kedvezmenyesArak.tajekoztatoErtek)
+
+    })
 
     // Kedvezmény mértékének beállítása
-    if (mertek >= 0) {
-      // Korábbi kedvezmény törlése
-      let kedvezmenyekRow = kedvezmenyekTable.rows().data().filter(row => row[2] == "Kedvezmény")[0]
-      if (kedvezmenyekRow) {
-        kedvezmenyekTable.row(':last').remove()
-      } 
-      // Ha a kedvezmény mértéke nem 0, akkor hozzáadjuk a kedvezmény sort
-      if (mertek !== 0){
-        kedvezmenyekTable.row.add(["", "", "Kedvezmény", "", -1 * mertek + ' EUR', "", -1 * mertek + ' EUR', ""])
-      }
-    }
+    // if (mertek >= 0) {
+    //   // Korábbi kedvezmény törlése
+    //   let kedvezmenyekRow = kedvezmenyekTable.rows().data().filter(row => row[2] == "Kedvezmény")[0]
+    //   if (kedvezmenyekRow) {
+    //     kedvezmenyekTable.row(':last').remove()
+    //   } 
+    //   // Ha a kedvezmény mértéke nem 0, akkor hozzáadjuk a kedvezmény sort
+    //   if (mertek !== 0){
+    //     kedvezmenyekTable.row.add(["", "", "Kedvezmény", "", -1 * mertek + ' EUR', "", -1 * mertek + ' EUR', ""])
+    //   }
+    // }
 
     kedvezmenyekTable.draw();
     $('#kedvezmeny-cancel').trigger('click');
