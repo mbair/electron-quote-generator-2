@@ -578,6 +578,12 @@ const currencyFormatHU = (num, decimals = 0) => {
         },
         customize: function (doc) {
 
+          let szazalek = parseInt($('#kedvezmeny-szazalek').val()) || 0
+          let mertek = parseInt($('#kedvezmeny-mertek').val()) || 0
+          let konkretAr = parseInt($('#kedvezmeny-konkretar').val()) || 0
+          let raklapos = $('#raklapos-tetel').is(':checked')
+          let erteJon = $('#szallitasi_forma').val() == 'Érte jön'
+
           // Remove the title created by datatTables
           doc.content.splice(0,1);
           //Create a date string that we use in the footer. Format is dd-mm-yyyy
@@ -691,22 +697,57 @@ const currencyFormatHU = (num, decimals = 0) => {
 
           // PDF Táblázat feltöltése a kedvezmény táblázat soraival
           let pdfTermekek = [template[7]['table']['body'][0]]
+          
           kedvezmenyekTable.data().map(row => {
+
+            // Eredeti árak beszerzése a Tételek Táblázatból
+            // Sor azonosítása terméknév szerint
+            let termekNev = row[2]
+            console.log('termekNev', termekNev)
+            console.log('tetelekTable.rows().data()', tetelekTable.rows().data())
+            let eredetiRow = tetelekTable.rows().data().filter(r => r[2] == termekNev)[0]
+
+            console.log('eredetiRow', eredetiRow)
+            if (!eredetiRow) return
+
+            // Eredeti árak
+            let eredetiArak = {
+              literAr: currencyFormatHU(eredetiRow[4], 2),
+              kiszereles: eredetiRow[3], 
+              kiszerelesAr: currencyFormatHU(eredetiRow[5], 2),
+              tajekoztatoErtek: currencyFormatHU(eredetiRow[6]),
+            }
 
             // Magyar számformátum használata
             row[5] = currencyFormatHU(row[5], 2)
             row[6] = currencyFormatHU(row[6], 2)
             row[7] = currencyFormatHU(row[7])
 
+            // Mindig megjelenő oszlopok (SAP kód, Terméknév, Kiszerelés (L, Kg))
             pdfTermekek.push([
               { text: row[1], alignment: 'right' }, // SAP kód
               { text: row[2], alignment: 'left'  }, // Terméknév
               { text: row[3], alignment: 'right' }, // Kiszerelés (L, Kg)
-              { text: row[5], alignment: 'right' }, // Termék nettó átadási ára (EUR/L, Kg)
-              { text: row[6], alignment: 'right' }, // Nettó átadási ár (EUR/kiszerelés)
-              { text: row[7], alignment: 'right' }, // Tájékoztató nettó ár (HUF/kiszerelés)
+              { text: eredetiArak.literAr, alignment: 'right' }, // Termék nettó átadási ára (EUR/L, Kg)
+              { text: eredetiArak.kiszerelesAr, alignment: 'right' }, // Nettó átadási ár (EUR/kiszerelés)
+              { text: row[5], alignment: 'right' }, // Termék kedvezményes nettó átadási ár (EUR/L, Kg)
+              { text: row[6], alignment: 'right' }, // Nettó kedvezményes átadási EUR ár/kiszer
             ])
+            
+
+            // if (raklapos) {
+            //   pdfTermekek.push([
+            //     { text: row[5], alignment: 'right' }, // Raklapos kedvezmény EUR/L, Kg
+            //   ])
+            // }
+            //   pdfTermekek.push([
+            //     { text: row[7], alignment: 'right' }, // Tájékoztató nettó ár (HUF/kiszerelés)
+            //   ])
+            //
+            
           })
+
+          console.log('pdfTermekek', pdfTermekek)
           
           template[7]['table']['body'] = pdfTermekek
           
@@ -815,23 +856,6 @@ const currencyFormatHU = (num, decimals = 0) => {
     // Vagy százalékos kedvezményt ad, vagy konrkét árat
 
     // Lehetséges kedvezmények
-    // - százalékos (0-30%)
-    // -- raklapos
-    // --- érte jön
-    // ---- mérték
-    // --- mérték
-    // -- mérték
-    // --- érte jön
-    // -- érte jön
-    // - konkrét ár
-    // -- raklapos
-    // --- érte jön
-    // ---- mérték
-    // --- mérték
-    // -- mérték
-    // --- érte jön
-    // -- érte jön
-
     // - százalékos (0-30%)
     // - százalékos + raklapos
     // - százalékos + raklapos + érte jön
