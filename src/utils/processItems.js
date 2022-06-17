@@ -173,13 +173,14 @@ export const processFile = async (filePath, outputPath, browserWindow) => {
     //   data: percentage
     // });
 
-    if (dataRows[i][7] == undefined){
+    // Ha nincs SAP kód, akkor kihagyjuk a sort
+    if (dataRows[i][0] == undefined){
       continue;
     } 
 
     // Számok kerekítése 2 tizedesjegyre és tizedes vessző alkalmazása pont helyett
     // let thousandRegExp = /\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g;
-    dataRows[i][9] = Number(dataRows[i][9]).toFixed(0)/*.toString().replace(thousandRegExp, " ");*/
+    dataRows[i][9] = Number(dataRows[i][9])/*.toFixed(2).toString().replace(thousandRegExp, " ");*/
     dataRows[i][18] = Number(dataRows[i][18]).toFixed(2)/*.toLocaleString().toString().replace(thousandRegExp, " ");*/
     dataRows[i][25] = Number(dataRows[i][25]).toFixed(2)/*.toLocaleString().toString().replace(thousandRegExp, " ");*/
     dataRows[i][26] = Math.ceil(dataRows[i][26])/*.toString().replace(thousandRegExp, " ");*/
