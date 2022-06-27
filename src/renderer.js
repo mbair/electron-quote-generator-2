@@ -278,8 +278,12 @@ window.addEventListener('message', event => {
       $('#arfolyam').text(arfolyam + ' HUF/EUR');
 
       tetelekTable.clear();
+
+      // Kedvezményes tételek
+      let kedvezmenyesTetelek = kedvezmenyekTable.rows().data()
+
       arajanlatRows.map((e, i) => {
-        tetelekTable.row.add([
+        let rowNode = tetelekTable.row.add([
           "",   // Checkbox
           e[0], // SAP kód: Kalkuláció A oszlopa
           e[1], // Terméknév: Kalkuláció H oszlopa
@@ -287,9 +291,18 @@ window.addEventListener('message', event => {
           e[3], // Átadási ár: Kalkuláció S oszlopa
           e[4], // Átadási ár EUR/kiszerelés: kiszerelés és a EUR/l szorzata
           e[5], // Tájékoztató érték HUF
-        ]).draw();
+        ])
+
+        // Hozzáadott sor megjelenítése a táblázatban
+        rowNode.draw()
+
+        // Ha szerepel már a kedvezmények táblában az adott terméknév, akkor selected-re állítjuk
+        let kedvezmenyes = kedvezmenyesTetelek.filter(r => r[1] == e[0])[0]
+        if (kedvezmenyes) {
+          rowNode.select()
+        }
       });
-      
+
       setTimeout(() => {
         menuHandler('#tetelek');
         $loader.hide();
@@ -298,15 +311,20 @@ window.addEventListener('message', event => {
       break;
     case 'json-feldolgozva':
       const { json } = data
+
+      // Ügyféladatok táblázat feltöltése JSON adatokkal
+      populate($('#ugyfeladatok-form'), json.ugyfeladatok)
+
+      // Táblázat feltöltése JSON adatokkal
       kedvezmenyekTable.clear()
-      json.body.map((e, i) => {
+      json.tablazat.body.map((e, i) => {
         kedvezmenyekTable.row.add(e).draw()
       })
       setTimeout(() => {
         menuHandler('#kedvezmenyek')
         $loader.hide()
       });
-      processCompletedHandler(json.body)
+      processCompletedHandler(data)
       break
     case 'process-completed':
       processCompletedHandler(data);
@@ -384,12 +402,75 @@ const currencyFormatHU = (num, decimals = 0) => {
   )
 }
 
+const populate = (form, data) => {
+  $.each(data, function(key, value) {  
+      var ctrl = $('[name='+key+']', form);  
+      switch(ctrl.prop("type")) { 
+          case "radio": case "checkbox":   
+              ctrl.each(function() {
+                  if($(this).attr('value') == value) $(this).attr("checked", value);
+              });   
+              break;  
+          default:
+              ctrl.val(value); 
+      }  
+  });  
+}
+
 /**
  * Oldal betöltés
  */
   
 (function () {
   'use strict'
+
+  $.fn.serializeObject = function() {
+    var o = {}
+    var a = this.serializeArray()
+    $.each(a, function() {
+        if (o[this.name]) {
+            if (!o[this.name].push) {
+                o[this.name] = [o[this.name]]
+            }
+            o[this.name].push(this.value || '')
+        } else {
+            o[this.name] = this.value || ''
+        }
+    });
+    return o
+  }
+
+  // Teszt ügyfél adatok
+  let tesztAdatok = {
+            
+    // Értékesítő
+    ertekesito_nev: 'Binder Zoltán',
+    ertekesito_osztaly: 'Közlekedési kenőanyagok',
+    ertekesito_email: 'binder.zoltan@lubexpert.hu',
+    ertekesito_kozvetlen_szam: '+36 20/296-9911',
+    ertekesito_fax: '+36 27/343-746',
+
+    // Ügyfél
+    ugyfel_nev: 'Kepecz Norbert',
+    cegnev: 'Partner Autóalkatrész Piac Kft.',
+    irsz: '7630',
+    varos: 'Pécs',
+    utca: 'Mohácsi út 14.',
+    email: 'n.kepecz@partnerauto.hu',
+    telefon: '30/929-4606',
+    fax: '1235678',
+    
+    // Ajánlat
+    szallitasi_forma: 'Kiszállítást kér',
+    ervenyesseg: '30 nap',
+    fizetesi_mod: 'Halasztott utalás',
+    utalas_eddig: '15 nap',
+  }
+
+  // Ügyféladatok feltöltése teszt adattal
+  // for (const [key, value] of Object.entries(tesztAdatok)) {
+  //   $('#'+key).val(value)
+  // }
 
   // Setup - add a text input to each header cell
   $('#tetelek-table thead tr')
@@ -550,7 +631,7 @@ const currencyFormatHU = (num, decimals = 0) => {
           'data-bs-toggle': 'modal', // Open modal
         },
         action: function ( e, dt, node, config ) {
-          let rows = kedvezmenyekTable.rows({selected: true}).data()
+          // let rows = kedvezmenyekTable.rows({selected: true}).data()
           // let maxSzazalek = Math.max.apply(Math, rows.map(i => parseInt(i[4])))
 
           // console.log('maxSzazalek', maxSzazalek)
@@ -577,13 +658,6 @@ const currencyFormatHU = (num, decimals = 0) => {
           order: 'applied'
         },
         customize: function (doc) {
-
-          let szazalek = parseInt($('#kedvezmeny-szazalek').val()) || 0
-          let mertek = parseInt($('#kedvezmeny-mertek').val()) || 0
-          let konkretAr = parseInt($('#kedvezmeny-konkretar').val()) || 0
-          let raklapos = $('#raklapos-tetel').is(':checked')
-          let erteJon = $('#szallitasi_forma').val() == 'Érte jön'
-
           // Remove the title created by datatTables
           doc.content.splice(0,1);
           //Create a date string that we use in the footer. Format is dd-mm-yyyy
@@ -619,37 +693,6 @@ const currencyFormatHU = (num, decimals = 0) => {
           }
 
           let template = JSON.stringify(arajanlatTemplate)
-
-          // Teszt adatok
-          let tesztAdatok = {
-            
-            // Értékesítő
-            ertekesito_nev: 'Binder Zoltán',
-            ertekesito_osztaly: 'Teszt osztály',
-            ertekesito_email: 'binder.zoltan@lubexpert.hu',
-            ertekesito_kozvetlen_szam: '+36 20/296-9911',
-            ertekesito_fax: '+36 27/343-746',
-
-            // Ügyfél
-            ugyfel_nev: 'Kepecz Norbert',
-            cegnev: 'Partner Autóalkatrész Piac Kft.',
-            irsz: '7630',
-            varos: 'Pécs',
-            utca: 'Mohácsi út 14.',
-            email: 'n.kepecz@partnerauto.hu',
-            telefon: '30/929-4606',
-            fax: '1235678',
-            
-            // Ajánlat
-            szallitasi_forma: 'Kiszállítást kér',
-            ervenyesseg: '30 nap',
-            fizetesi_mod: 'Halasztott utalás',
-            utalas_eddig: '15 nap',
-          }
-
-          // for (const [key, value] of Object.entries(tesztAdatok)) {
-          //   $('#'+key).val(value)
-          // }
 
           // Változók cseréje az árajánlat sablonban
           let fromTo = {
@@ -701,13 +744,9 @@ const currencyFormatHU = (num, decimals = 0) => {
           kedvezmenyekTable.data().map(row => {
 
             // Eredeti árak beszerzése a Tételek Táblázatból
-            // Sor azonosítása terméknév szerint
-            let termekNev = row[2]
-            console.log('termekNev', termekNev)
-            console.log('tetelekTable.rows().data()', tetelekTable.rows().data())
-            let eredetiRow = tetelekTable.rows().data().filter(r => r[2] == termekNev)[0]
-
-            console.log('eredetiRow', eredetiRow)
+            // Sor azonosítása termékkód szerint
+            let termekKod = row[1]
+            let eredetiRow = tetelekTable.rows().data().filter(r => r[1] == termekKod)[0]
             if (!eredetiRow) return
 
             // Eredeti árak
@@ -733,7 +772,6 @@ const currencyFormatHU = (num, decimals = 0) => {
               { text: row[5], alignment: 'right' }, // Termék kedvezményes nettó átadási ár (EUR/L, Kg)
               { text: row[6], alignment: 'right' }, // Nettó kedvezményes átadási EUR ár/kiszer
             ])
-            
 
             // if (raklapos) {
             //   pdfTermekek.push([
@@ -744,10 +782,9 @@ const currencyFormatHU = (num, decimals = 0) => {
             //     { text: row[7], alignment: 'right' }, // Tájékoztató nettó ár (HUF/kiszerelés)
             //   ])
             //
-            
           })
 
-          console.log('pdfTermekek', pdfTermekek)
+          // console.log('pdfTermekek', pdfTermekek)
           
           template[7]['table']['body'] = pdfTermekek
           
@@ -789,12 +826,21 @@ const currencyFormatHU = (num, decimals = 0) => {
       {
         text: 'Ajánlat mentése',
         action: function ( e, dt, button, config ) {
-            var data = dt.buttons.exportData();
+          dt.rows().deselect()
+          let ugyfelNev = $('#ugyfel_nev').val().replace(/[/\\?%*:|"<>]/g, '-') || ''
+          let d = new Date()
+          let datum = d.getFullYear()+'-'+(1+d.getMonth())+'-'+d.getDate()
+          let fileName = ugyfelNev + ' ' + datum
+          let ugyfeladatok = $('#ugyfeladatok-form').serializeObject()
+          let fileData = {
+            ugyfeladatok: ugyfeladatok,
+            tablazat: dt.buttons.exportData()
+          }
 
-            $.fn.dataTable.fileSave(
-                new Blob( [ JSON.stringify( data ) ] ),
-                'Export.json'
-            );
+          $.fn.dataTable.fileSave(
+              new Blob( [ JSON.stringify( fileData ) ] ),
+              fileName+'.json'
+          );
         }
     }
     ] 
@@ -806,26 +852,35 @@ const currencyFormatHU = (num, decimals = 0) => {
   const syncTables = (e, dt, type, indexes) => {
     if (type !== 'row') return;
 
-    kedvezmenyekTable.clear();
-    selectedTetelek = tetelekTable.rows({ selected: true }).data();
+    let row = tetelekTable.row(indexes).data()
 
-    if (!selectedTetelek.length){
-      kedvezmenyekTable.destroy(); 
-      kedvezmenyekTable = $('#kedvezmenyek-table').DataTable(kedvezmenyekTableConfig);
-      return;
-    } 
+    // Sor kijelölés esetén hozzáadjuk a kedvezmények táblához a kijelölt sort
+    if (e.type === 'select') {
 
-    for (var i=0; i < selectedTetelek.length; i++){
+      // Ha már hozzá van adva a sor (importálásnál fordulhat elő)
+      // Akkor nem adjuk újra hozzá
+      let marVanIlyen = kedvezmenyekTable.rows().data().filter(data => data[1] == row[1])[0]
+      if (marVanIlyen) return
+  
       kedvezmenyekTable.row.add([
-        "",                    // Checkbox
-        selectedTetelek[i][1], // SAP kód: Kalkuláció A oszlopa
-        selectedTetelek[i][2], // Terméknév: Kalkuláció H oszlopa
-        selectedTetelek[i][3], // Kiszerelés: Kalkuláció J oszlopa
-        "",                    // Kedvezmény
-        selectedTetelek[i][4], // Átadási ár: Kalkuláció S oszlopa
-        selectedTetelek[i][5], // Átadási ár EUR/kiszerelés: kiszerelés és a EUR/l szorzata
-        selectedTetelek[i][6], // Tájékoztató nettó ár HUF
+        "",     // Checkbox
+        row[1], // SAP kód: Kalkuláció A oszlopa
+        row[2], // Terméknév: Kalkuláció H oszlopa
+        row[3], // Kiszerelés: Kalkuláció J oszlopa
+        "",     // Kedvezmény
+        row[4], // Átadási ár: Kalkuláció S oszlopa
+        row[5], // Átadási ár EUR/kiszerelés: kiszerelés és a EUR/l szorzata
+        row[6], // Tájékoztató nettó ár HUF
       ]).draw();
+    }
+
+    // Pipa törlés esetén töröljük a kedvezmények táblából a megfelelő sort
+    if (e.type == 'deselect') {
+
+      kedvezmenyekTable
+        .rows((idx, data, node) => data[1] === row[1])
+        .remove()
+        .draw()
     }
   }
 
@@ -904,11 +959,11 @@ const currencyFormatHU = (num, decimals = 0) => {
     // Kedvezmény alkalmazása a táblázat soraira
     rows.every(function (rowIdx, tableLoop, rowLoop) {
 
-      let termekNev = kedvezmenyekTable.cell(rowIdx, 1).data()
+      let termekKod = kedvezmenyekTable.cell(rowIdx, 0).data()
       let tovabbiKedvezmeny = 0
 
-      // Sor azonosítása terméknév szerint
-      let row = tetelekTable.rows().data().filter(row => row[1] == termekNev)[0]
+      // Sor azonosítása termékkód szerint
+      let row = tetelekTable.rows().data().filter(row => row[0] == termekKod)[0]
       if (!row) return
 
       // Eredeti árak
@@ -939,7 +994,7 @@ const currencyFormatHU = (num, decimals = 0) => {
         kedvezmenyesArak = {
           kedvezmeny: (parseFloat(eredetiArak.literAr) - parseFloat(konkretAr)).toFixed(2) * -1 + ' EUR',
           literAr: konkretAr,
-          kiszerelesAr: konkretAr * eredetiArak.kiszereles,
+          kiszerelesAr: parseFloat(konkretAr * eredetiArak.kiszereles).toFixed(2),
           tajekoztatoErtek: konkretAr * eredetiArak.kiszereles * arfolyam,
         }
       }
@@ -979,23 +1034,11 @@ const currencyFormatHU = (num, decimals = 0) => {
     //   }
     // }
 
-    kedvezmenyekTable.draw();
+    // kedvezmenyekTable.draw(); // újrarajzolással a táblázat elejére ugrik, ezt nem szeretnék.
     $('#kedvezmeny-cancel').trigger('click');
   }
 
   $('#kedvezmeny-save').on('click', kedvezmenySave);
-
-  // tetelekTable.on('select deselect', function (e, dt, type, indexes){
-  //   if (type === 'row') {
-  //     kedvezmenyekTable.clear();
-  //     selectedTetelek = tetelekTable.rows({ selected: true }).data();
-
-  //     for (var i=0; i < selectedTetelek.length; i++){
-  //       kedvezmenyekTable.row.add(["", selectedTetelek[i][1], selectedTetelek[i][2], selectedTetelek[i][3]]).draw();
-  //     }
-  //   }
-  // });
-
 
   // Fizetési mód függvényében jelenítjük meg az "utalas_eddig" mezőt
   $('#fizetesi_mod').on('change', function(){

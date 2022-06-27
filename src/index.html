@@ -172,13 +172,13 @@
       <div class="row g-2">
         <div class="col-md">
           <div class="form-floating">
-            <input type="text" class="form-control" id="ertekesito_nev" placeholder="Értékesítő neve">
+            <input type="text" class="form-control" id="ertekesito_nev" name="ertekesito_nev" placeholder="Értékesítő neve">
             <label for="ertekesito_nev">Értékesítő neve</label>
           </div>
         </div>
         <div class="col-md">
           <div class="form-floating">
-            <select id="ertekesito_osztaly" class="form-select" aria-label="Értékesítő osztály">
+            <select id="ertekesito_osztaly" name="ertekesito_osztaly" class="form-select" aria-label="Értékesítő osztály">
               <option value="Közlekedési kenőanyagok" selected>Közlekedési kenőanyagok</option>
               <option value="Ipari kenőanyagok">Ipari kenőanyagok</option>
             </select>
@@ -187,19 +187,19 @@
         </div>
         <div class="col-md">
           <div class="form-floating">
-            <input type="text" class="form-control" id="ertekesito_email" placeholder="Értékesítő email">
+            <input type="text" class="form-control" id="ertekesito_email" name="ertekesito_email" placeholder="Értékesítő email">
             <label for="ertekesito_email">Értékesítő email</label>
           </div>
         </div>
         <div class="col-md">
           <div class="form-floating">
-            <input type="text" class="form-control" id="ertekesito_kozvetlen_szam" placeholder="Közvetlen szám">
+            <input type="text" class="form-control" id="ertekesito_kozvetlen_szam" name="ertekesito_kozvetlen_szam" placeholder="Közvetlen szám">
             <label for="ertekesito_kozvetlen_szam">Közvetlen szám</label>
           </div>
         </div>
         <div class="col-md">
           <div class="form-floating">
-            <input type="text" class="form-control" id="ertekesito_fax" placeholder="Fax szám">
+            <input type="text" class="form-control" id="ertekesito_fax" name="ertekesito_fax" placeholder="Fax szám">
             <label for="ertekesito_fax">Fax szám</label>
           </div>
         </div>
@@ -211,13 +211,13 @@
       <div class="row g-2 mb-3">
         <div class="col-md">
           <div class="form-floating">
-            <input type="text" class="form-control" id="ugyfel_nev" placeholder="Ügyfél neve">
+            <input type="text" class="form-control" id="ugyfel_nev" name="ugyfel_nev" placeholder="Ügyfél neve">
             <label for="ugyfel_nev">Ügyfél neve</label>
           </div>
         </div>
         <div class="col-md">
           <div class="form-floating">
-            <input type="text" class="form-control" id="cegnev" placeholder="Cégnév">
+            <input type="text" class="form-control" id="cegnev" name="cegnev" placeholder="Cégnév">
             <label for="cegnev">Cégnév</label>
           </div>
         </div>
@@ -226,25 +226,25 @@
       <div class="row g-2 mb-3">
         <div class="col-md">
           <div class="form-floating">
-            <input type="text" class="form-control" id="irsz" placeholder="Irányítószám">
+            <input type="text" class="form-control" id="irsz" name="irsz" placeholder="Irányítószám">
             <label for="irsz">Irányítószám</label>
           </div>
         </div>
         <div class="col-md">
           <div class="form-floating">
-            <input type="text" class="form-control" id="varos" placeholder="Város">
+            <input type="text" class="form-control" id="varos" name="varos" placeholder="Város">
             <label for="varos">Város</label>
           </div>
         </div>
         <div class="col-md">
           <div class="form-floating">
-            <input type="text" class="form-control" id="utca" placeholder="Utca">
+            <input type="text" class="form-control" id="utca" name="utca" placeholder="Utca">
             <label for="utca">Utca</label>
           </div>
         </div>
         <!-- <div class="col-md">
           <div class="form-floating">
-            <input type="text" class="form-control" id="hazsszam" placeholder="Házszám">
+            <input type="text" class="form-control" id="hazsszam" name="hazsszam" placeholder="Házszám">
             <label for="hazsszam">Házszám</label>
           </div>
         </div> -->
@@ -253,19 +253,19 @@
       <div class="row g-2">
         <div class="col-md">
           <div class="form-floating">
-            <input type="text" class="form-control" id="email" placeholder="Email">
+            <input type="text" class="form-control" id="email" name="email" placeholder="Email">
             <label for="email">Email</label>
           </div>
         </div>
         <div class="col-md">
           <div class="form-floating">
-            <input type="text" class="form-control" id="telefon" placeholder="Telefon">
+            <input type="text" class="form-control" id="telefon" name="telefon" placeholder="Telefon">
             <label for="telefon">Telefon</label>
           </div>
         </div>
         <div class="col-md">
           <div class="form-floating">
-            <input type="text" class="form-control" id="fax" placeholder="Fax">
+            <input type="text" class="form-control" id="fax" name="fax" placeholder="Fax">
             <label for="fax">Fax</label>
           </div>
         </div>
@@ -277,7 +277,7 @@
       <div class="row g-2">
         <div class="col-md">
           <div class="form-floating">
-            <select id="szallitasi_forma" class="form-select" aria-label="Szállítási forma">
+            <select id="szallitasi_forma" name="szallitasi_forma" class="form-select" aria-label="Szállítási forma">
               <option value="Kiszállítást kér" selected>Kiszállítást kér</option>
               <option value="Érte jön">Érte jön</option>
             </select>
@@ -286,7 +286,7 @@
         </div>
         <div class="col-md">
           <div class="form-floating">
-            <select id="ervenyesseg" class="form-select" aria-label="Ajánlat érvényesség">
+            <select id="ervenyesseg" name="ervenyesseg" class="form-select" aria-label="Ajánlat érvényesség">
               <option value="15 nap" selected>15 nap</option>
               <option value="30 nap">30 nap</option>
               <option value="45 nap">45 nap</option>
@@ -297,7 +297,7 @@
         </div>
         <div class="col-md">
           <div class="form-floating">
-            <select id="fizetesi_mod" class="form-select" aria-label="Fizetési mód">
+            <select id="fizetesi_mod" name="fizetesi_mod" class="form-select" aria-label="Fizetési mód">
               <option value="Előre utalás" selected>Előre utalás</option>
               <option value="Halasztott utalás">Halasztott utalás</option>
               <option value="Készpénzes fizetés">Készpénzes fizetés</option>
@@ -307,7 +307,7 @@
         </div>
         <div class="col-md d-none"><!-- Csak "Halasztott utalás" esetén látható -->
           <div class="form-floating">
-            <select id="utalas_eddig" class="form-select" aria-label="Utalás eddig">
+            <select id="utalas_eddig" name="utalas_eddig" class="form-select" aria-label="Utalás eddig">
               <option value="8 nap" selected>8 nap</option>
               <option value="15 nap">15 nap</option>
               <option value="30 nap">30 nap</option>
