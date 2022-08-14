@@ -403,18 +403,23 @@ const currencyFormatHU = (num, decimals = 0) => {
 }
 
 const populate = (form, data) => {
+  
   $.each(data, function(key, value) {  
-      var ctrl = $('[name='+key+']', form);  
+      
+    var ctrl = $('[name='+key+']', form)
+      
       switch(ctrl.prop("type")) { 
           case "radio": case "checkbox":   
               ctrl.each(function() {
-                  if($(this).attr('value') == value) $(this).attr("checked", value);
-              });   
-              break;  
+                  if($(this).attr('value') == value) $(this).attr("checked", value)
+              })
+              break
           default:
-              ctrl.val(value); 
-      }  
-  });  
+              ctrl.val(value)
+      }
+      
+      ctrl.trigger('change')
+  })
 }
 
 /**
@@ -724,7 +729,7 @@ const populate = (form, data) => {
             '%szallitas_text%': $('#szallitasi_forma').val() == 'Érte jön' ? '' : 'A szállítás díjmentes.',
             '%evernyesseg%': $('#ervenyesseg').val(),
             '%fizetesi_mod%': $('#fizetesi_mod').val(),
-            '%hatarido%': $('#fizetesi_mod').val() == 'Előre utalás' ? '0 nap' : $('#utalas_eddig').val(),
+            '%hatarido%': ['Előre utalás','Készpénzes fizetés'].includes($('#fizetesi_mod').val()) ? '0 nap' : $('#utalas_eddig').val(),
             '%arfolyam%': parseInt($('#arfolyam').text()),
             '%datum%': today,
             '%oldalak_szama%': doc['footer'].length,
