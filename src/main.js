@@ -46,6 +46,15 @@ const createWindow = () => {
   if (process.env.NODE_ENV === 'development') {
     win.webContents.openDevTools();
   }
+
+  // after window already loaded
+  // win.once('ready-to-show', () => {
+
+  //   // load XLS file automatically
+  //   let filePath = 'C:/Users/BalazsGabris/Downloads/DSR Price calculator 20220201-v55.xlsx';
+  //   processFile(filePath, null, win);
+  // });
+
 };
 
 // This method will be called when Electron has finished
@@ -53,6 +62,7 @@ const createWindow = () => {
 // Some APIs can only be used after this event occurs.
 // app.on('ready', createWindow);
 app.on('ready', () => {
+
   ipcMain.on('file-dropped', (event, filePath) => {
 
     console.log('filePath', filePath)

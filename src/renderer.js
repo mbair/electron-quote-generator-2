@@ -959,11 +959,11 @@ const populate = (form, data) => {
     // Kedvezmény alkalmazása a táblázat soraira
     rows.every(function (rowIdx, tableLoop, rowLoop) {
 
-      let termekKod = kedvezmenyekTable.cell(rowIdx, 0).data()
+      let termekKod = kedvezmenyekTable.cell(rowIdx, 1).data()
       let tovabbiKedvezmeny = 0
 
       // Sor azonosítása termékkód szerint
-      let row = tetelekTable.rows().data().filter(row => row[0] == termekKod)[0]
+      let row = tetelekTable.rows().data().filter(row => row[1] == termekKod)[0]
       if (!row) return
 
       // Eredeti árak
