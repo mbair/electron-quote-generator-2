@@ -1,8 +1,8 @@
 {
   "name": "lubexpert-arajanlat-keszito",
-  "productName": "Lubexpert Arajánlat Keszito",
+  "productName": "Lubexpert Arajanlat Keszito",
   "version": "2.0.0",
-  "description": "Lubexpert Arajánlat Keszito",
+  "description": "Lubexpert Arajanlat Keszito",
   "main": ".webpack/main",
   "scripts": {
     "start": "electron-forge start",
