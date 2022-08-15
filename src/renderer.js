@@ -53,9 +53,9 @@ const filesInput = document.querySelector('#files');
 const errorArea = document.querySelector('.error-toast');
 const notificationArea = document.querySelector('.notification-toast');
 
-
 var tetelekTable;
 var kedvezmenyekTable;
+var mentettAjanlat = false;
 
 const handleIn = () => {
 
@@ -311,6 +311,8 @@ window.addEventListener('message', event => {
       break;
     case 'json-feldolgozva':
       const { json } = data
+
+      mentettAjanlat = true
 
       // Ügyféladatok táblázat feltöltése JSON adatokkal
       populate($('#ugyfeladatok-form'), json.ugyfeladatok)
@@ -964,6 +966,7 @@ const populate = (form, data) => {
     // Kedvezmény alkalmazása a táblázat soraira
     rows.every(function (rowIdx, tableLoop, rowLoop) {
 
+      let kedvezmenyRow = kedvezmenyekTable.row(rowIdx).node()
       let termekKod = kedvezmenyekTable.cell(rowIdx, 1).data()
       let tovabbiKedvezmeny = 0
 
@@ -1024,6 +1027,12 @@ const populate = (form, data) => {
       kedvezmenyekTable.cell(rowIdx, 6).data(kedvezmenyesArak.kiszerelesAr)
       kedvezmenyekTable.cell(rowIdx, 7).data(kedvezmenyesArak.tajekoztatoErtek)
 
+      // Korábban mentett ajánlatnál új kedvezmény megadása esetén
+      // megjelöljük a szerkesztett sort
+      if (mentettAjanlat == true) {
+        $(kedvezmenyRow).addClass('kesz-sor')
+      }
+      
     })
 
     // Kedvezmény mértékének beállítása
