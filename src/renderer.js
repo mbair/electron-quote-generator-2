@@ -902,6 +902,7 @@ const populate = (form, data) => {
   const kedvezmenySave = () => {
     
     let szazalek = parseInt($('#kedvezmeny-szazalek').val()) || 0
+    let ertek = parseInt($('#kedvezmeny-ertek').val()) || 0
     let mertek = parseInt($('#kedvezmeny-mertek').val()) || 0
     let konkretAr = parseInt($('#kedvezmeny-konkretar').val()) || 0
     let raklapos = $('#raklapos-tetel').is(':checked')
@@ -939,12 +940,13 @@ const populate = (form, data) => {
     // Az árat befolyásoló tényezők 
     // - százalékos
     // - konrét ár
+    // - kedvezmény értéke
 
     // Működőképes logika
     // IF százalékos
     //    százalékos kedvezmény beállítása soronként
     //
-    // ELSE konkrét ár
+    // ELSE IF konkrét ár
     //    konkrét ár kedvezmény beállítása soronként
     // ENDIF
     //
@@ -954,6 +956,10 @@ const populate = (form, data) => {
     //
     // IF ÉRTE JÖN
     //    ÉRTE JÖN kedvezmény hozzádazása soronként
+    // ENDIF
+    //
+    // IF ÉRTÉK
+    //    ÉRTÉK kedvezémny hozzádazása
     // ENDIF
     //
     // IF MÉRTÉK
@@ -1012,6 +1018,9 @@ const populate = (form, data) => {
 
       // Érte jön kedvezmény
       if (erteJon) tovabbiKedvezmeny += 0.09
+
+      // Érték kedvezmény (konkrét ár inverze, konkrét kedvezmény érték termékenként)
+      if (ertek) tovabbiKedvezmeny += ertek
 
       if (tovabbiKedvezmeny > 0) {
         kedvezmenyesArak.kedvezmeny = tovabbiKedvezmeny + ' EUR' + kedvezmenyesArak.kedvezmeny
